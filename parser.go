@@ -12,15 +12,13 @@ import (
 
 var spaceRegex = regexp.MustCompile(`\s+`)
 
-func parseFile(path string) ([]*middleware, error) {
+func parseFile(path string) ([]middleware, error) {
 	fileContent, err := readFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	parse(string(fileContent))
-
-	return nil, nil
+	return parse(string(fileContent))
 }
 
 /**
@@ -37,6 +35,24 @@ func readFile(path string) ([]byte, error) {
 	return ioutil.ReadFile(path)
 }
 
+/**
+Get content and parse it to the middleware language.
+Scanning row by row ignoring spaces, and do validation checks do (with the help methods).
+Content can contain few classes and enums.
+Classes and enums declaration should be like:
+
+class className
+{
+	dataMember int
+	another string
+}
+
+enum enumName
+{
+	value 5
+	anotherValue 8
+}
+*/
 func parse(fileContent string) ([]middleware, error) {
 	scanner := bufio.NewScanner(strings.NewReader(fileContent))
 
