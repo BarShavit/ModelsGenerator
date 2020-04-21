@@ -1,0 +1,81 @@
+package ModelsGenerator
+
+import "fmt"
+
+type goLanguageSerializer struct {
+	typesMap map[string]string
+}
+
+func newGoLanguageSerializer() *goLanguageSerializer {
+	result := &goLanguageSerializer{typesMap: make(map[string]string, 0)}
+
+	result.typesMap["bool"] = "bool"
+	result.typesMap["int"] = "int"
+	result.typesMap["string"] = "string"
+	result.typesMap["double"] = "float64"
+	result.typesMap["float"] = "float32"
+	result.typesMap["char"] = "byte"
+	result.typesMap["byte"] = "byte"
+
+	return result
+}
+
+func (g *goLanguageSerializer) getType() languageType {
+	return LanguageTypeGo
+}
+
+func (g *goLanguageSerializer) generateCode(objects []middleware, serializerInfo *serializerInfo) ([]*generatedCode, error) {
+	result := make([]*generatedCode, 0)
+
+	for _, object := range objects {
+		serialized, err := g.serializeMiddleware(object)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, serialized)
+	}
+
+	return result, nil
+}
+
+func (g *goLanguageSerializer) serializeMiddleware(middleware middleware, serializerInfo *serializerInfo) (*generatedCode, error) {
+
+}
+
+func (g *goLanguageSerializer) serializeDeclaration(serializerInfo *serializerInfo) string {
+	if serializerInfo.packageName == "" {
+		return ""
+	}
+
+	return fmt.Sprintf("package %s\n\n", serializerInfo.packageName)
+}
+
+func (g *goLanguageSerializer) serializeClass(class *class, serializerInfo *serializerInfo) (*generatedCode, error) {
+	serializedCode := g.serializeDeclaration(serializerInfo)
+	fileName := fmt.Sprintf("%s.go", class.name)
+
+	serializedCode += fmt.Sprintf("type %s struct {\n", class.name)
+
+	for _, member := range class.dataMembers {
+		if isList, listType := isList(member.memberType); isList {
+			serializedCode += fmt.Sprintf("\t%s []*%s", member.name, listType)
+			continue
+		}
+
+		if isMap, mapKeyType, mapValueType := isMap(member.memberType); isMap {
+			serializedCode += fmt.Sprintf("\t%s map[%s]*%s", member.name, mapKeyType, mapValueType)
+			continue
+		}
+
+		if primitiveType, ok := g.typesMap[member.memberType]; ok {
+			serializedCode += fmt.Sprintf("\t%s %s", member.name, primitiveType)
+			continue
+		}
+
+		// It's not a language type, so we create it as a pointer
+		serializedCode += fmt.Sprintf("\t%s *%s", member.name, member.memberType)
+	}
+
+	return newGeneratedCode(fileName, serializedCode), nil
+}
