@@ -6,8 +6,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
+
+var spaceRegex = regexp.MustCompile(`\s+`)
 
 func parseFile(path string) ([]*middleware, error) {
 	fileContent, err := readFile(path)
@@ -39,20 +42,22 @@ func parse(fileContent string) ([]middleware, error) {
 
 	result := make([]middleware, 0)
 	var currentMiddleware middleware = nil
+	startAddMembers := false
 
 	currentLine := 0
 
 	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
+		line := trimContent(scanner.Text())
 		currentLine++
 
 		// Receiving { while reading another object
-		if currentMiddleware != nil && line == "{" {
-			return nil, errors.New(fmt.Sprintf(
-				"failed to parse. Unexpected { token in line %v", currentLine))
-		}
-
 		if line == "{" {
+			if startAddMembers {
+				return nil, errors.New(fmt.Sprintf(
+					"failed to parse. Unexpected { token in line %v", currentLine))
+			}
+
+			startAddMembers = true
 			continue
 		}
 
@@ -60,6 +65,7 @@ func parse(fileContent string) ([]middleware, error) {
 		if line == "}" {
 			result = append(result, currentMiddleware)
 			currentMiddleware = nil
+			startAddMembers = false
 			continue
 		}
 
@@ -73,6 +79,13 @@ func parse(fileContent string) ([]middleware, error) {
 
 			currentMiddleware = mw
 			continue
+		}
+
+		// We got to a data member or enum value before getting {
+		// after the class/enum declare
+		if !startAddMembers {
+			return nil, errors.New(fmt.Sprintf(
+				"expected for { token before starting get values in row %v", currentLine))
 		}
 
 		if err := readMiddlewareValue(currentMiddleware, line); err != nil {
@@ -110,7 +123,11 @@ func readMiddlewareValue(middleware middleware, line string) error {
 			"tried to read a new value, but got string with the wrong length %s", line))
 	}
 
-	middleware.addValue(splittedLine[0], splittedLine[1])
+	return middleware.addValue(splittedLine[0], splittedLine[1])
+}
 
-	return nil
+func trimContent(content string) string {
+	// Delete all the double whitespaces before the final trim
+	s := spaceRegex.ReplaceAllString(content, " ")
+	return strings.TrimSpace(s)
 }
