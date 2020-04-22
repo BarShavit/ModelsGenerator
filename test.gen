@@ -1,7 +1,7 @@
 class test
 {
 	bla int
-	blabla string
+	blaBla string
 }
 
 enum stupidenum

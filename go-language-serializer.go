@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 )
 
@@ -77,27 +76,30 @@ func (g *goLanguageSerializer) serializeClass(class *class, serializerInfo *seri
 	serializedCode := g.serializeDeclaration(serializerInfo)
 	fileName := fmt.Sprintf("%s.go", class.name)
 
-	serializedCode += fmt.Sprintf("type %s struct {\n", strings.ToUpper(class.name))
+	serializedCode += fmt.Sprintf("type %s struct {\n", toFirstCharUpper(class.name))
 
 	for _, member := range class.dataMembers {
 		if isList, listType := isList(member.memberType); isList {
-			serializedCode += fmt.Sprintf("\t%s []*%s\n", strings.ToUpper(member.name), listType)
+			serializedCode += fmt.Sprintf("\t%s []*%s `json:\"%s\"`\n",
+				toFirstCharUpper(member.name), listType, toCamelCase(member.name))
 			continue
 		}
 
 		if isMap, mapKeyType, mapValueType := isMap(member.memberType); isMap {
-			serializedCode += fmt.Sprintf("\t%s map[%s]*%s\n", strings.ToUpper(member.name),
-				mapKeyType, mapValueType)
+			serializedCode += fmt.Sprintf("\t%s map[%s]*%s `json:\"%s\"`\n", toFirstCharUpper(member.name),
+				mapKeyType, mapValueType, toCamelCase(member.name))
 			continue
 		}
 
 		if primitiveType, ok := g.typesMap[member.memberType]; ok {
-			serializedCode += fmt.Sprintf("\t%s %s\n", strings.ToUpper(member.name), primitiveType)
+			serializedCode += fmt.Sprintf("\t%s %s `json:\"%s\"`\n",
+				toFirstCharUpper(member.name), primitiveType, toCamelCase(member.name))
 			continue
 		}
 
 		// It's not a language type, so we create it as a pointer
-		serializedCode += fmt.Sprintf("\t%s *%s\n", strings.ToUpper(member.name), member.memberType)
+		serializedCode += fmt.Sprintf("\t%s *%s `json:\"%s\"`\n",
+			toFirstCharUpper(member.name), member.memberType, toCamelCase(member.name))
 	}
 
 	serializedCode += "}"
@@ -114,7 +116,7 @@ func (g *goLanguageSerializer) serializeEnum(enum *enum, serializerInfo *seriali
 
 	for _, value := range enum.enumValues {
 		serializedCode += fmt.Sprintf("\t%s%s = %s(%v)\n", enum.name,
-			strings.ToUpper(value.name), enum.name, value.value)
+			toFirstCharUpper(value.name), enum.name, value.value)
 	}
 
 	serializedCode += ")"

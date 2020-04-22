@@ -1,6 +1,9 @@
 package main
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 /**
 Check if the data member is list.
@@ -48,4 +51,20 @@ func isMap(memberType string) (bool, string, string) {
 	}
 
 	return false, "", ""
+}
+
+func toCamelCase(value string) string {
+	if len(value) < 2 {
+		return strings.ToLower(value)
+	}
+
+	return fmt.Sprintf("%s%s", strings.ToLower(string(value[0])), value[1:])
+}
+
+func toFirstCharUpper(value string) string {
+	if len(value) < 2 {
+		return strings.ToUpper(value)
+	}
+
+	return fmt.Sprintf("%s%s", strings.ToUpper(string(value[0])), value[1:])
 }
