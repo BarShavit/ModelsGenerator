@@ -47,6 +47,10 @@ func isMap(memberType string) (bool, string, string) {
 
 		typesSplit := strings.Split(splittedList[1], ",")
 
+		if len(typesSplit) < 2 {
+			return false, "", ""
+		}
+
 		return true, typesSplit[0], typesSplit[1]
 	}
 
