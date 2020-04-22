@@ -1,4 +1,4 @@
-package ModelsGenerator
+package main
 
 import (
 	"reflect"
@@ -117,31 +117,31 @@ func Test_readMiddlewareDeclare(t *testing.T) {
 		wantErr bool
 	}{
 		{name: "Creating valid class",
-			args:    struct{ line string }{line: "class bla"},
+			args:    args{line: "class bla"},
 			want:    newClass("bla"),
 			wantErr: false},
 		{name: "Creating valid enum",
-			args:    struct{ line string }{line: "enum bla"},
+			args:    args{line: "enum bla"},
 			want:    newEnum("bla"),
 			wantErr: false},
 		{name: "Empty line",
-			args:    struct{ line string }{line: ""},
+			args:    args{line: ""},
 			want:    nil,
 			wantErr: true},
 		{name: "Class without name",
-			args:    struct{ line string }{line: "class"},
+			args:    args{line: "class"},
 			want:    nil,
 			wantErr: true},
 		{name: "Enum without name",
-			args:    struct{ line string }{line: "enum"},
+			args:    args{line: "enum"},
 			want:    nil,
 			wantErr: true},
 		{name: "Ignore data member",
-			args:    struct{ line string }{line: "int bla"},
+			args:    args{line: "int bla"},
 			want:    nil,
 			wantErr: true},
 		{name: "Ignore enum value",
-			args:    struct{ line string }{line: "SOME_VALUE 5"},
+			args:    args{line: "SOME_VALUE 5"},
 			want:    nil,
 			wantErr: true},
 	}
@@ -173,38 +173,23 @@ func Test_readMiddlewareValue(t *testing.T) {
 		wantErr bool
 	}{
 		{name: "Valid data member in class",
-			args: struct {
-				middleware middleware
-				line       string
-			}{middleware: classArg, line: "test int"},
+			args:    args{middleware: classArg, line: "test int"},
 			wantErr: false},
 
 		{name: "Valid enum value",
-			args: struct {
-				middleware middleware
-				line       string
-			}{middleware: enumArg, line: "test 5"},
+			args:    args{middleware: enumArg, line: "test 5"},
 			wantErr: false},
 
 		{name: "Invalid enum value",
-			args: struct {
-				middleware middleware
-				line       string
-			}{middleware: enumArg, line: "test fdgdf"},
+			args:    args{middleware: enumArg, line: "test fdgdf"},
 			wantErr: true},
 
 		{name: "Invalid line",
-			args: struct {
-				middleware middleware
-				line       string
-			}{middleware: enumArg, line: "test"},
+			args:    args{middleware: enumArg, line: "test"},
 			wantErr: true},
 
 		{name: "Empty line",
-			args: struct {
-				middleware middleware
-				line       string
-			}{middleware: enumArg, line: ""},
+			args:    args{middleware: enumArg, line: ""},
 			wantErr: true},
 	}
 
