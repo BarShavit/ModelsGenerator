@@ -1,0 +1,11 @@
+class test
+{
+	bla int
+	blabla string
+}
+
+enum stupidenum
+{
+	value 5
+	another 8
+}

@@ -17,3 +17,9 @@
 #Jetbrains
 .idea/
 *.iml
+
+#generated code
+go/
+kotlin/
+typescript/
+csharp/

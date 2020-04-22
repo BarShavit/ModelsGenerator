@@ -66,6 +66,11 @@ func parse(fileContent string) ([]middleware, error) {
 		line := trimContent(scanner.Text())
 		currentLine++
 
+		// User can just skip lines
+		if line == "" {
+			continue
+		}
+
 		// Receiving { while reading another object
 		if line == "{" {
 			if startAddMembers {

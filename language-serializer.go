@@ -24,5 +24,6 @@ func newGeneratedCode(fileName string, code string) *generatedCode {
 
 type languageSerializer interface {
 	getType() languageType
+	getTypeName() string
 	generateCode(objects []middleware, serializerInfo *serializerInfo) ([]*generatedCode, error)
 }
