@@ -18,8 +18,10 @@ type languageParameter struct {
 
 func main() {
 	serializers[LanguageTypeGo] = newGoLanguageSerializer()
+	serializers[LanguageTypeKotlin] = newKotlinLanguageSerializer()
 
 	languageMap["go"] = LanguageTypeGo
+	languageMap["kotlin"] = LanguageTypeKotlin
 
 	if err := handleCommand(); err != nil {
 		panic(err)
@@ -27,7 +29,7 @@ func main() {
 }
 
 func handleCommand() error {
-	if len(os.Args) > 0 && os.Args[1] == "help" {
+	if len(os.Args) > 1 && os.Args[1] == "help" {
 		println("Hello! This tool helps you to convert a \"gen\" file into different languages models.\n" +
 			"The format should be \"gen-file-path.gen language:package\". You can avoid from adding package name.\n" +
 			"The supported languages are Go, Kotlin, C# and Typescript.\n" +

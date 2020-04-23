@@ -20,6 +20,7 @@ func newGoLanguageSerializer() *goLanguageSerializer {
 	result.typesMap["float"] = "float32"
 	result.typesMap["char"] = "byte"
 	result.typesMap["byte"] = "byte"
+	result.typesMap["date"] = "time.Time"
 
 	return result
 }
