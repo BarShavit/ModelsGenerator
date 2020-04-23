@@ -5,12 +5,16 @@ import (
 	"testing"
 )
 
-func getValidParse() (string, string, []middleware) {
+func getValidParse() (string, string, string, []middleware) {
 	validContent := "class someclass\n{\nsomemember string\nanother int\n}\n" +
 		"enum someEnum\n{\nfirst 5\nsecond 8\n}"
 
 	spacedValidContent := "class    someclass\n{\nsomemember    string\n     another int\n}\n" +
 		"enum someEnum\n{\nfirst 5\nsecond 8\n}"
+
+	validWithEmptyLinesContent := "class someclass\n\n{\nsomemember string\n\n\nanother int\n}\n" +
+		"enum someEnum\n{\nfirst 5\nsecond 8\n}"
+
 	expectedValidContent := []middleware{
 		&class{
 			name: "someclass",
@@ -40,11 +44,11 @@ func getValidParse() (string, string, []middleware) {
 		},
 	}
 
-	return validContent, spacedValidContent, expectedValidContent
+	return validContent, spacedValidContent, validWithEmptyLinesContent, expectedValidContent
 }
 
 func Test_parse(t *testing.T) {
-	validContent, spacedContent, expectedMeddlers := getValidParse()
+	validContent, spacedContent, withEmptyLinesContent, expectedMeddlers := getValidParse()
 
 	type args struct {
 		fileContent string
@@ -88,6 +92,12 @@ func Test_parse(t *testing.T) {
 		{
 			name:    "Valid spaced content",
 			args:    args{fileContent: spacedContent},
+			want:    expectedMeddlers,
+			wantErr: false,
+		},
+		{
+			name:    "With empty lines",
+			args:    struct{ fileContent string }{fileContent: withEmptyLinesContent},
 			want:    expectedMeddlers,
 			wantErr: false,
 		},

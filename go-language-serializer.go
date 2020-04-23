@@ -80,14 +80,27 @@ func (g *goLanguageSerializer) serializeClass(class *class, serializerInfo *seri
 
 	for _, member := range class.dataMembers {
 		if isList, listType := isList(member.memberType); isList {
-			serializedCode += fmt.Sprintf("\t%s []*%s `json:\"%s\"`\n",
-				toFirstCharUpper(member.name), listType, toCamelCase(member.name))
+			// If the list type isn't primitive, we put it as a pointer
+			pointerMark := ""
+			if _, shouldNotBePointer := g.typesMap[listType]; !shouldNotBePointer {
+				pointerMark = "*"
+			}
+
+			serializedCode += fmt.Sprintf("\t%s []%s%s `json:\"%s\"`\n",
+				toFirstCharUpper(member.name), pointerMark, listType, toCamelCase(member.name))
 			continue
 		}
 
 		if isMap, mapKeyType, mapValueType := isMap(member.memberType); isMap {
-			serializedCode += fmt.Sprintf("\t%s map[%s]*%s `json:\"%s\"`\n", toFirstCharUpper(member.name),
-				mapKeyType, mapValueType, toCamelCase(member.name))
+			// If the map value type isn't primitive, we put it as a pointer
+			// We assume the key is a primitive
+			pointerMark := ""
+			if _, shouldNotBePointer := g.typesMap[mapValueType]; !shouldNotBePointer {
+				pointerMark = "*"
+			}
+
+			serializedCode += fmt.Sprintf("\t%s map[%s]%s%s `json:\"%s\"`\n", toFirstCharUpper(member.name),
+				mapKeyType, pointerMark, mapValueType, toCamelCase(member.name))
 			continue
 		}
 
