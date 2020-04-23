@@ -4,6 +4,11 @@ class test
 	blaBla string
 }
 
+class test2
+{
+    inner test
+}
+
 enum stupidenum
 {
 	value 5
