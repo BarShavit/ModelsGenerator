@@ -87,6 +87,11 @@ func (g *goLanguageSerializer) serializeClass(class *class, serializerInfo *seri
 				pointerMark = "*"
 			}
 
+			primitiveType, isPrimitive := g.typesMap[listType]
+			if isPrimitive {
+				listType = primitiveType
+			}
+
 			serializedCode += fmt.Sprintf("\t%s []%s%s `json:\"%s\"`\n",
 				toFirstCharUpper(member.name), pointerMark, listType, toCamelCase(member.name))
 			continue
@@ -98,6 +103,16 @@ func (g *goLanguageSerializer) serializeClass(class *class, serializerInfo *seri
 			pointerMark := ""
 			if _, shouldNotBePointer := g.typesMap[mapValueType]; !shouldNotBePointer {
 				pointerMark = "*"
+			}
+
+			primitiveType, isPrimitive := g.typesMap[mapKeyType]
+			if isPrimitive {
+				mapKeyType = primitiveType
+			}
+
+			primitiveType, isPrimitive = g.typesMap[mapValueType]
+			if isPrimitive {
+				mapValueType = primitiveType
 			}
 
 			serializedCode += fmt.Sprintf("\t%s map[%s]%s%s `json:\"%s\"`\n", toFirstCharUpper(member.name),

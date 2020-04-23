@@ -82,12 +82,27 @@ func (k *kotlinLanguageSerializer) serializeClass(class *class, serializerInfo *
 
 	for _, member := range class.dataMembers {
 		if isList, listType := isList(member.memberType); isList {
+			primitiveType, isPrimitive := k.typesMap[listType]
+			if isPrimitive {
+				listType = primitiveType
+			}
+
 			serializedCode += fmt.Sprintf("val %s: List<%s>, ",
 				toCamelCase(member.name), listType)
 			continue
 		}
 
 		if isMap, mapKeyType, mapValueType := isMap(member.memberType); isMap {
+			primitiveType, isPrimitive := k.typesMap[mapKeyType]
+			if isPrimitive {
+				mapKeyType = primitiveType
+			}
+
+			primitiveType, isPrimitive = k.typesMap[mapValueType]
+			if isPrimitive {
+				mapValueType = primitiveType
+			}
+
 			serializedCode += fmt.Sprintf("val %s: HashMap<%s, %s>, ", toCamelCase(member.name),
 				toFirstCharUpper(mapKeyType), toFirstCharUpper(mapValueType))
 			continue
