@@ -7,6 +7,8 @@ class test
 class test2
 {
     inner test
+    someList list<int>
+    randomMap map<int,string>
 }
 
 enum stupidenum

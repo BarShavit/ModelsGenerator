@@ -20,10 +20,12 @@ func main() {
 	serializers[LanguageTypeGo] = newGoLanguageSerializer()
 	serializers[LanguageTypeKotlin] = newKotlinLanguageSerializer()
 	serializers[LanguageTypeTypescript] = newTypescriptLanguageSerializer()
+	serializers[LanguageTypeCSharp] = newCsharpLanguageSerializer()
 
 	languageMap["go"] = LanguageTypeGo
 	languageMap["kotlin"] = LanguageTypeKotlin
 	languageMap["typescript"] = LanguageTypeTypescript
+	languageMap["c#"] = LanguageTypeCSharp
 
 	if err := handleCommand(); err != nil {
 		panic(err)

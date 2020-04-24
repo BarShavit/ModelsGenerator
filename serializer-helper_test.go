@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func Test_isList(t *testing.T) {
 	type args struct {
@@ -196,6 +199,42 @@ func Test_toFirstCharUpper(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := toFirstCharUpper(tt.args.value); got != tt.want {
 				t.Errorf("toFirstCharUpper() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_appendUnique(t *testing.T) {
+	type args struct {
+		strings []string
+		str     string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []string
+	}{
+		{
+			name: "Unique",
+			args: args{
+				strings: []string{},
+				str:     "new",
+			},
+			want: []string{"new"},
+		},
+		{
+			name: "Not unique",
+			args: args{
+				strings: []string{"a"},
+				str:     "a",
+			},
+			want: []string{"a"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := appendUnique(tt.args.strings, tt.args.str); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("appendUnique() = %v, want %v", got, tt.want)
 			}
 		})
 	}

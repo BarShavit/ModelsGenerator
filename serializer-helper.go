@@ -72,3 +72,13 @@ func toFirstCharUpper(value string) string {
 
 	return fmt.Sprintf("%s%s", strings.ToUpper(string(value[0])), value[1:])
 }
+
+func appendUnique(strings []string, str string) []string {
+	for _, s := range strings {
+		if s == str {
+			return strings
+		}
+	}
+
+	return append(strings, str)
+}

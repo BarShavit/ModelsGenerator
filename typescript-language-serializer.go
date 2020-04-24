@@ -37,7 +37,7 @@ func (t *typescriptLanguageSerializer) generateCode(objects []middleware, serial
 	result := make([]*generatedCode, 0)
 
 	for _, object := range objects {
-		serialized, err := t.serializeMiddleware(object, serializerInfo)
+		serialized, err := t.serializeMiddleware(object)
 		if err != nil {
 			return nil, err
 		}
@@ -48,7 +48,7 @@ func (t *typescriptLanguageSerializer) generateCode(objects []middleware, serial
 	return result, nil
 }
 
-func (t *typescriptLanguageSerializer) serializeMiddleware(middleware middleware, serializerInfo *serializerInfo) (*generatedCode, error) {
+func (t *typescriptLanguageSerializer) serializeMiddleware(middleware middleware) (*generatedCode, error) {
 	if class, ok := middleware.(*class); ok {
 		return t.serializeClass(class)
 	}
@@ -88,7 +88,7 @@ func (t *typescriptLanguageSerializer) serializeClass(class *class) (*generatedC
 			if tsType, isPrimitive := t.typesMap[listType]; isPrimitive {
 				listType = tsType
 			} else {
-				imports = append(imports, listType)
+				imports = appendUnique(imports, listType)
 				listType = toFirstCharUpper(listType)
 			}
 
@@ -102,13 +102,13 @@ func (t *typescriptLanguageSerializer) serializeClass(class *class) (*generatedC
 				mapKeyType = keyPrimitiveType
 			} else {
 				// Not suppose to happen, but it's user's problem
-				mapKeyType = toCamelCase(mapKeyType)
+				mapKeyType = toFirstCharUpper(mapKeyType)
 			}
 
 			if valuePrimitiveType, isPrimitive := t.typesMap[mapValueType]; isPrimitive {
 				mapValueType = valuePrimitiveType
 			} else {
-				imports = append(imports, mapValueType)
+				imports = appendUnique(imports, mapValueType)
 				mapValueType = toFirstCharUpper(mapValueType)
 			}
 
@@ -129,7 +129,7 @@ func (t *typescriptLanguageSerializer) serializeClass(class *class) (*generatedC
 		serializedCode += fmt.Sprintf("\t%s: %s;\n",
 			toCamelCase(member.name), toFirstCharUpper(member.memberType))
 
-		imports = append(imports, member.memberType)
+		imports = appendUnique(imports, member.memberType)
 	}
 
 	serializedCode += "}"
