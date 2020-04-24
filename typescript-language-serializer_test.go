@@ -492,7 +492,7 @@ func Test_typescriptLanguageSerializer_serializeMiddleware(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := g.serializeMiddleware(tt.args.middleware, tt.args.serializerInfo)
+			got, err := g.serializeMiddleware(tt.args.middleware)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("serializeMiddleware() error = %v, wantErr %v", err, tt.wantErr)
 				return
