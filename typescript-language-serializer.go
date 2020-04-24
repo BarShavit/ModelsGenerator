@@ -68,7 +68,7 @@ func (t *typescriptLanguageSerializer) serializeDeclaration(imports []string) st
 
 	result := ""
 	for _, imp := range imports {
-		result += fmt.Sprintf("import { %s } from \"./%s\"\n",
+		result += fmt.Sprintf("import { %s } from \"./%s\";\n",
 			toFirstCharUpper(imp), toCamelCase(imp))
 	}
 
@@ -148,8 +148,13 @@ func (t *typescriptLanguageSerializer) serializeEnum(enum *enum) (*generatedCode
 			toFirstCharUpper(value.name), value.value)
 	}
 
-	// Delete the last ,
-	serializedCode = serializedCode[:len(serializedCode)-2]
+	if len(enum.enumValues) > 1 {
+		// Delete the last ,
+		serializedCode = serializedCode[:len(serializedCode)-2]
+	} else {
+		// Delete the unused \n
+		serializedCode = serializedCode[:len(serializedCode)-1]
+	}
 
 	serializedCode += "\n}"
 
