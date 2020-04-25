@@ -82,3 +82,23 @@ func appendUnique(strings []string, str string) []string {
 
 	return append(strings, str)
 }
+
+func memberUnique(members []*dataMember, member *dataMember) bool {
+	for _, m := range members {
+		if m.name == member.name {
+			return false
+		}
+	}
+
+	return true
+}
+
+func enumValueUnique(values []*enumValue, value *enumValue) bool {
+	for _, v := range values {
+		if v.name == value.name {
+			return false
+		}
+	}
+
+	return true
+}

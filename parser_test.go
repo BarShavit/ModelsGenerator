@@ -47,8 +47,24 @@ func getValidParse() (string, string, string, []middleware) {
 	return validContent, spacedValidContent, validWithEmptyLinesContent, expectedValidContent
 }
 
+func getDuplicateElementCode() (string, string) {
+	class := "class someclass\n{\nsomemember string\nsomemember int\n}\n" +
+		"enum someEnum\n{\nfirst 5\nsecond 8\n}"
+	enum := "enum someenum\n{\nvalue 1\nvalue 5\n}\n" +
+		"enum someEnum\n{\nfirst 5\nsecond 8\n}"
+
+	return class, enum
+}
+
+func getEnumWithInvalidValues() string {
+	return "enum someenum\n{\nvalue 1\nvalue fghfg\n}\n" +
+		"enum someEnum\n{\nfirst 5\nsecond 8\n}"
+}
+
 func Test_parse(t *testing.T) {
 	validContent, spacedContent, withEmptyLinesContent, expectedMeddlers := getValidParse()
+	duplicateValueClass, duplicateValueEnum := getDuplicateElementCode()
+	invalidEnumValues := getEnumWithInvalidValues()
 
 	type args struct {
 		fileContent string
@@ -100,6 +116,24 @@ func Test_parse(t *testing.T) {
 			args:    struct{ fileContent string }{fileContent: withEmptyLinesContent},
 			want:    expectedMeddlers,
 			wantErr: false,
+		},
+		{
+			name:    "Duplicate member class",
+			args:    struct{ fileContent string }{fileContent: duplicateValueClass},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Duplicate value enum",
+			args:    struct{ fileContent string }{fileContent: duplicateValueEnum},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Enum with invalid values",
+			args:    struct{ fileContent string }{fileContent: invalidEnumValues},
+			want:    nil,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {

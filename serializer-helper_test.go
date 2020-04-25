@@ -223,7 +223,7 @@ func Test_appendUnique(t *testing.T) {
 			want: []string{"new"},
 		},
 		{
-			name: "Not unique",
+			name: "Not memberUnique",
 			args: args{
 				strings: []string{"a"},
 				str:     "a",
@@ -235,6 +235,100 @@ func Test_appendUnique(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := appendUnique(tt.args.strings, tt.args.str); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("appendUnique() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_memberUnique(t *testing.T) {
+	type args struct {
+		members []*dataMember
+		member  *dataMember
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "Unique member",
+			args: args{
+				members: []*dataMember{},
+				member: &dataMember{
+					memberType: "int",
+					name:       "test",
+				},
+			},
+			want: true,
+		},
+		{
+			name: "Not memberUnique member",
+			args: args{
+				members: []*dataMember{
+					{
+						memberType: "string",
+						name:       "test",
+					},
+				},
+				member: &dataMember{
+					memberType: "int",
+					name:       "test",
+				},
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := memberUnique(tt.args.members, tt.args.member); got != tt.want {
+				t.Errorf("memberUnique() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_enumValueUnique(t *testing.T) {
+	type args struct {
+		values []*enumValue
+		value  *enumValue
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "Unique enum value",
+			args: args{
+				values: []*enumValue{},
+				value: &enumValue{
+					name:  "test",
+					value: 1,
+				},
+			},
+			want: true,
+		},
+		{
+			name: "Not unique enum value",
+			args: args{
+				values: []*enumValue{
+					{
+						name:  "test",
+						value: 5,
+					},
+				},
+				value: &enumValue{
+					name:  "test",
+					value: 1,
+				},
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := enumValueUnique(tt.args.values, tt.args.value); got != tt.want {
+				t.Errorf("enumValueUnique() = %v, want %v", got, tt.want)
 			}
 		})
 	}

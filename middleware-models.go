@@ -1,6 +1,10 @@
 package main
 
-import "strconv"
+import (
+	"errors"
+	"fmt"
+	"strconv"
+)
 
 type middlewareType int
 
@@ -42,8 +46,14 @@ The value parameter is the data member type
 func (c *class) addValue(name string, value string) error {
 	member := &dataMember{
 		memberType: value,
-		name:       name,
+		name:       toCamelCase(name),
 	}
+
+	if !memberUnique(c.dataMembers, member) {
+		return errors.New(fmt.Sprintf(
+			"tried to add member %s to class %s, but it is already exists", name, c.name))
+	}
+
 	c.dataMembers = append(c.dataMembers, member)
 
 	return nil
@@ -77,9 +87,15 @@ func (e *enum) addValue(name string, value string) error {
 	}
 
 	newEnumValue := &enumValue{
-		name:  name,
+		name:  toCamelCase(name),
 		value: v,
 	}
+
+	if !enumValueUnique(e.enumValues, newEnumValue) {
+		return errors.New(fmt.Sprintf(
+			"tried to add enum value %s to enum %s, but it's already exists", name, e.name))
+	}
+
 	e.enumValues = append(e.enumValues, newEnumValue)
 
 	return nil
