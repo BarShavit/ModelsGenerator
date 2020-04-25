@@ -1,17 +1,20 @@
 class test
 {
-	bla int
-	blaBla string
+	first int
+	second string
+	third bool
+	listType list<int>
+	mapType map<int,string>
 }
 
-class test2
+class anotherClass
 {
     inner test
     someList list<int>
-    randomMap map<int,string>
+    randomMap map<int,test>
 }
 
-enum stupidenum
+enum randomEnum
 {
 	value 5
 	another 8
