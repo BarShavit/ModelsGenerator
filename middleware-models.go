@@ -95,7 +95,6 @@ func (e *enum) addValue(name string, value string) error {
 		return errors.New(fmt.Sprintf(
 			"tried to add enum value %s to enum %s, but it's already exists", name, e.name))
 	}
-
 	e.enumValues = append(e.enumValues, newEnumValue)
 
 	return nil
